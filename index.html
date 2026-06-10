@@ -169,7 +169,7 @@
     Parler à Alma
   </button>
 
-  <div class="footer">Propulsé par EM Normandie</div>
+  <div class="footer">Alma — AI Receptionist</div>
 </div>
 
 <script id="retell-widget"
@@ -177,19 +177,37 @@
   type="module"
   data-public-key="public_key_8a48de5b19bafcae69af4"
   data-agent-id="ag_432bf9045b4a95c362608881d6"
-  data-show-widget-button="false">
+  data-show-widget-button="true"
+  data-button-position="bottom-right"
+  style="display:none">
 </script>
 
 <script>
   function openWidget() {
-    const widget = document.getElementById('retell-widget');
-    if (widget && widget.openWidget) {
-      widget.openWidget();
-    } else {
-      const event = new CustomEvent('retell-widget-open');
-      document.dispatchEvent(event);
+    const btn = document.querySelector('[data-retell-widget-button], .retell-widget-button, #retell-widget-btn');
+    if (btn) {
+      btn.click();
+      return;
     }
+    const allBtns = document.querySelectorAll('button');
+    for (const b of allBtns) {
+      if (b.id && b.id.includes('retell')) { b.click(); return; }
+    }
+    const shadow = document.querySelector('retell-widget');
+    if (shadow && shadow.shadowRoot) {
+      const inner = shadow.shadowRoot.querySelector('button');
+      if (inner) { inner.click(); return; }
+    }
+    document.dispatchEvent(new CustomEvent('retell:open'));
+    window.dispatchEvent(new CustomEvent('retell:open'));
   }
+
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const widgetBtn = document.querySelector('[class*="retell"][class*="button"], [id*="retell"][id*="button"]');
+      if (widgetBtn) widgetBtn.style.display = 'none';
+    }, 1500);
+  });
 </script>
 
 </body>

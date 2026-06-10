@@ -6,9 +6,7 @@
 <title>Alma — Assistante virtuelle étudiante</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
     --bg: #0a0a0f;
     --surface: #13131a;
@@ -19,7 +17,6 @@
     --text-secondary: #8884a8;
     --font: 'Inter', sans-serif;
   }
-
   html, body {
     height: 100%;
     background: var(--bg);
@@ -27,7 +24,6 @@
     font-family: var(--font);
     -webkit-font-smoothing: antialiased;
   }
-
   body {
     display: flex;
     flex-direction: column;
@@ -35,9 +31,7 @@
     justify-content: center;
     min-height: 100vh;
     padding: 2rem;
-    gap: 0;
   }
-
   .glow {
     position: fixed;
     top: -200px;
@@ -49,7 +43,6 @@
     pointer-events: none;
     z-index: 0;
   }
-
   .card {
     position: relative;
     z-index: 1;
@@ -61,7 +54,6 @@
     width: 100%;
     text-align: center;
   }
-
   .badge {
     display: inline-flex;
     align-items: center;
@@ -76,7 +68,6 @@
     letter-spacing: 0.04em;
     margin-bottom: 1.5rem;
   }
-
   .dot {
     width: 6px;
     height: 6px;
@@ -84,12 +75,10 @@
     border-radius: 50%;
     animation: pulse 2s ease-in-out infinite;
   }
-
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(0.8); }
   }
-
   h1 {
     font-size: 3rem;
     font-weight: 600;
@@ -98,7 +87,6 @@
     margin-bottom: 0.5rem;
     line-height: 1;
   }
-
   .school {
     font-size: 0.85rem;
     font-weight: 400;
@@ -107,42 +95,48 @@
     text-transform: uppercase;
     margin-bottom: 1.25rem;
   }
-
   p {
     font-size: 1rem;
     color: var(--text-secondary);
     line-height: 1.65;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
     font-weight: 300;
   }
-
-  .btn {
-    display: inline-flex;
+  .cta-hint {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 10px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    padding: 14px 28px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    font-family: var(--font);
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.15s;
-    text-decoration: none;
+    margin-top: 0.5rem;
   }
-
-  .btn:hover { opacity: 0.88; transform: translateY(-1px); }
-  .btn:active { transform: translateY(0); }
-
-  .btn svg { width: 18px; height: 18px; }
-
+  .arrow-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    opacity: 0.7;
+    animation: bounce 1.5s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
+  }
+  .arrow-hint svg {
+    width: 14px;
+    height: 14px;
+  }
   .footer {
     margin-top: 2rem;
     font-size: 0.75rem;
     color: var(--text-secondary);
-    opacity: 0.5;
+    opacity: 0.4;
+  }
+
+  /* Force le bouton Retell au centre */
+  :host, retell-widget {
+    display: flex;
+    justify-content: center;
   }
 </style>
 </head>
@@ -162,12 +156,14 @@
   <p>Votre assistante virtuelle étudiante.<br>
   Calendrier, démarches administratives,<br>orientation vers les bons services.</p>
 
-  <button class="btn" onclick="openWidget()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-    </svg>
-    Parler à Alma
-  </button>
+  <div class="cta-hint">
+    <div class="arrow-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+      Cliquez sur le bouton ci-dessous pour parler à Alma
+    </div>
+  </div>
 
   <div class="footer">Alma — AI Receptionist</div>
 </div>
@@ -177,30 +173,27 @@
   type="module"
   data-public-key="public_key_8a48de5b19bafcae69af4"
   data-agent-id="agent_432bf9045b4a95c362608881d6"
-  data-show-widget-button="true"
-  data-button-position="bottom-right"
-  style="display:none">
+  data-show-widget-button="true">
 </script>
 
 <script>
-  function openWidget() {
-    // Try shadow DOM first
-    const allEls = document.querySelectorAll('*');
-    for (const el of allEls) {
-      if (el.shadowRoot) {
-        const btns = el.shadowRoot.querySelectorAll('button');
-        for (const btn of btns) {
-          btn.click();
-          return;
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const allEls = document.querySelectorAll('*');
+      for (const el of allEls) {
+        if (el.shadowRoot) {
+          const btn = el.shadowRoot.querySelector('button');
+          if (btn) {
+            btn.style.position = 'fixed';
+            btn.style.bottom = '50%';
+            btn.style.right = '50%';
+            btn.style.transform = 'translate(50%, 50%)';
+            btn.style.zIndex = '9999';
+          }
         }
       }
-    }
-    // Fallback: click any button that isn't ours
-    const allBtns = document.querySelectorAll('button');
-    for (const b of allBtns) {
-      if (!b.classList.contains('btn')) { b.click(); return; }
-    }
-  }
+    }, 1000);
+  });
 </script>
 
 </body>

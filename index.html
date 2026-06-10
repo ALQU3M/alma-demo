@@ -184,30 +184,23 @@
 
 <script>
   function openWidget() {
-    const btn = document.querySelector('[data-retell-widget-button], .retell-widget-button, #retell-widget-btn');
-    if (btn) {
-      btn.click();
-      return;
+    // Try shadow DOM first
+    const allEls = document.querySelectorAll('*');
+    for (const el of allEls) {
+      if (el.shadowRoot) {
+        const btns = el.shadowRoot.querySelectorAll('button');
+        for (const btn of btns) {
+          btn.click();
+          return;
+        }
+      }
     }
+    // Fallback: click any button that isn't ours
     const allBtns = document.querySelectorAll('button');
     for (const b of allBtns) {
-      if (b.id && b.id.includes('retell')) { b.click(); return; }
+      if (!b.classList.contains('btn')) { b.click(); return; }
     }
-    const shadow = document.querySelector('retell-widget');
-    if (shadow && shadow.shadowRoot) {
-      const inner = shadow.shadowRoot.querySelector('button');
-      if (inner) { inner.click(); return; }
-    }
-    document.dispatchEvent(new CustomEvent('retell:open'));
-    window.dispatchEvent(new CustomEvent('retell:open'));
   }
-
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      const widgetBtn = document.querySelector('[class*="retell"][class*="button"], [id*="retell"][id*="button"]');
-      if (widgetBtn) widgetBtn.style.display = 'none';
-    }, 1500);
-  });
 </script>
 
 </body>

@@ -89,7 +89,6 @@
   }
   .school {
     font-size: 0.85rem;
-    font-weight: 400;
     color: var(--text-secondary);
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -99,44 +98,45 @@
     font-size: 1rem;
     color: var(--text-secondary);
     line-height: 1.65;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     font-weight: 300;
   }
-  .cta-hint {
-    display: flex;
-    flex-direction: column;
+  .btn-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  .btn-overlay {
+    display: inline-flex;
     align-items: center;
     gap: 10px;
-    margin-top: 0.5rem;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 28px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    position: relative;
+    z-index: 10;
   }
-  .arrow-hint {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    opacity: 0.7;
-    animation: bounce 1.5s ease-in-out infinite;
-  }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(4px); }
-  }
-  .arrow-hint svg {
-    width: 14px;
-    height: 14px;
+  .btn-overlay:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-overlay:active { transform: translateY(0); opacity: 0.75; }
+  .retell-hidden {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
   }
   .footer {
     margin-top: 2rem;
     font-size: 0.75rem;
     color: var(--text-secondary);
     opacity: 0.4;
-  }
-
-  /* Force le bouton Retell au centre */
-  :host, retell-widget {
-    display: flex;
-    justify-content: center;
   }
 </style>
 </head>
@@ -156,43 +156,52 @@
   <p>Votre assistante virtuelle étudiante.<br>
   Calendrier, démarches administratives,<br>orientation vers les bons services.</p>
 
-  <div class="cta-hint">
-    <div class="arrow-hint">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 5v14M5 12l7 7 7-7"/>
+  <div class="btn-wrapper">
+    <button class="btn-overlay" id="fake-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
       </svg>
-      Cliquez sur le bouton ci-dessous pour parler à Alma
-    </div>
+      Parler à Alma
+    </button>
   </div>
 
   <div class="footer">Alma — AI Receptionist</div>
 </div>
 
-<script id="retell-widget"
-  src="https://dashboard.retellai.com/retell-widget.js"
-  type="module"
-  data-public-key="public_key_8a48de5b19bafcae69af4"
-  data-agent-id="agent_432bf9045b4a95c362608881d6"
-  data-show-widget-button="true">
-</script>
+<div class="retell-hidden" id="retell-container">
+  <script id="retell-widget"
+    src="https://dashboard.retellai.com/retell-widget.js"
+    type="module"
+    data-public-key="public_key_8a48de5b19bafcae69af4"
+    data-agent-id="agent_432bf9045b4a95c362608881d6"
+    data-show-widget-button="true">
+  </script>
+</div>
 
 <script>
-  window.addEventListener('load', () => {
+  document.getElementById('fake-btn').addEventListener('click', function() {
+    // Rendre visible le container Retell et cliquer sur son bouton
+    const container = document.getElementById('retell-container');
+    container.style.pointerEvents = 'auto';
+
     setTimeout(() => {
+      // Chercher dans tout le DOM incluant shadow roots
       const allEls = document.querySelectorAll('*');
       for (const el of allEls) {
         if (el.shadowRoot) {
-          const btn = el.shadowRoot.querySelector('button');
-          if (btn) {
-            btn.style.position = 'fixed';
-            btn.style.bottom = '50%';
-            btn.style.right = '50%';
-            btn.style.transform = 'translate(50%, 50%)';
-            btn.style.zIndex = '9999';
+          const btns = el.shadowRoot.querySelectorAll('button');
+          for (const btn of btns) {
+            btn.click();
+            return;
           }
         }
       }
-    }, 1000);
+      // Fallback : chercher bouton hors shadow
+      const btns = document.querySelectorAll('button');
+      for (const btn of btns) {
+        if (btn.id !== 'fake-btn') { btn.click(); return; }
+      }
+    }, 300);
   });
 </script>
 
